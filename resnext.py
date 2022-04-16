@@ -6,16 +6,18 @@ import matplotlib.image as mpimg
 model = torch.hub.load('pytorch/vision:v0.6.0', 'resnext50_32x4d', pretrained=True)
 model.eval()
 
-from PIL import Image
+#PIL to load image from a file
+from PIL import Image 
 from torchvision import transforms
 
 #All pre-trained models expect input images normalized in the same way, i.e. mini-batches of 3-channel RGB images of shape 
-# (3 x H x W), where H and W are expected to be at least 224. The images have to be loaded in to a range of [0, 1] and then 
-# normalized using mean = [0.485, 0.456, 0.406] and std = [0.229, 0.224, 0.225].
+#(3 x H x W), where H and W are expected to be at least 224. The images have to be loaded in to a range of [0, 1] and then 
+#normalized using mean = [0.485, 0.456, 0.406] and std = [0.229, 0.224, 0.225].
+
 preprocess_default = transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
-        transforms.ToTensor(),
+        transforms.ToTensor(), #transforms a PIL image or numpy.ndarray to tensor
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
 
@@ -68,6 +70,8 @@ def resnext_classify(filename, printout=False):
 
     print(probabilities.size())
 
+    #with function: It’s handy when you have two related operations which you’d like to execute as a pair 
+    # and you need the execution of both of them to be guaranteed no matter how the nested code in between them might exit. 
     with open("testimg/imagenet_classes.txt", "r") as f:
         categories = [s.strip() for s in f.readlines()]
     # Show top categories per image
@@ -92,7 +96,7 @@ def resnext_classify(filename, printout=False):
     topfive_string_mapped = map(str, topfive_string)
     topfive_string_imglegend = ''.join(topfive_string_mapped)
     
-    #shows the image
+    #opens a window and shows the image
     img = mpimg.imread(filename)
     plt.imshow(img)
     plt.text(1,15,topfive_string_imglegend,fontdict={'fontsize': 6, 'fontweight': 'medium'})
